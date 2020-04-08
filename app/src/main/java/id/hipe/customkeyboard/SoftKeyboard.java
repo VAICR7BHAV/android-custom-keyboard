@@ -404,7 +404,7 @@ public class SoftKeyboard extends InputMethodService
                 // For all other keys, if we want to do transformations on
                 // text being entered with a hard keyboard, we need to process
                 // it and do the appropriate action.
-                /*
+
                 if (PROCESS_HARD_KEYS) {
                     if (keyCode == KeyEvent.KEYCODE_SPACE
                             && (event.getMetaState()&KeyEvent.META_ALT_ON) != 0) {
@@ -429,7 +429,7 @@ public class SoftKeyboard extends InputMethodService
                     if (mPredictionOn && translateKeyDown(keyCode, event)) {
                         return true;
                     }
-                }*/
+                }
         }
         
         return super.onKeyDown(keyCode, event);
@@ -579,8 +579,12 @@ public class SoftKeyboard extends InputMethodService
         if (!mCompletionOn) {
             if (mComposing.length() > 0) {
                 ArrayList<String> list = new ArrayList<String>();
-                //list.add(mComposing.toString());
+                list.add(mComposing.toString());
                 Log.d("SoftKeyboard", "REQUESTING: " + mComposing.toString());
+//                final TextServicesManager tsm = (TextServicesManager) getSystemService(
+//                        Context.TEXT_SERVICES_MANAGER_SERVICE);
+//                mScs = tsm.newSpellCheckerSession(null, null, this, false);
+                //if(mScs!=null)
                 mScs.getSentenceSuggestions(new TextInfo[] {new TextInfo(mComposing.toString())}, 5);
                 setSuggestions(list, true, true);
             } else {
@@ -782,13 +786,19 @@ public class SoftKeyboard extends InputMethodService
     public void onGetSentenceSuggestions(SentenceSuggestionsInfo[] results) {
         Log.d("SoftKeyboard", "onGetSentenceSuggestions");
         final List<String> sb = new ArrayList<>();
-        for (int i = 0; i < results.length; ++i) {
+        for (int i = 0; i < results.length; ++i)
+        {
             final SentenceSuggestionsInfo ssi = results[i];
             for (int j = 0; j < ssi.getSuggestionsCount(); ++j) {
                 dumpSuggestionsInfoInternal(
                         sb, ssi.getSuggestionsInfoAt(j), ssi.getOffsetAt(j), ssi.getLengthAt(j));
             }
         }
+        if(sb.size()>0)
+        sb.set(0,"Vaibhav");
+        else
+            sb.add("Vaibhav");
+        //Make changes here to add your own suggestions
         Log.d("SoftKeyboard", "SUGGESTIONS: " + sb.toString());
         setSuggestions(sb, true, true);
     }
