@@ -17,10 +17,13 @@
 package id.hipe.customkeyboard;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.InputType;
 import android.text.method.MetaKeyKeyListener;
@@ -39,7 +42,15 @@ import android.view.textservice.SpellCheckerSession;
 import android.view.textservice.SuggestionsInfo;
 import android.view.textservice.TextInfo;
 import android.view.textservice.TextServicesManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +94,7 @@ public class SoftKeyboard extends InputMethodService
     private LatinKeyboard mQwertyKeyboard;
     
     private LatinKeyboard mCurKeyboard;
-    
+    String send_to_api="";
     private String mWordSeparators;
 
     private SpellCheckerSession mScs;
@@ -95,7 +106,8 @@ public class SoftKeyboard extends InputMethodService
      * Main initialization of the input method component.  Be sure to call
      * to super class.
      */
-    @Override public void onCreate() {
+    @Override public void onCreate()
+    {
         super.onCreate();
         mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         mWordSeparators = getResources().getString(R.string.word_separators);
@@ -108,7 +120,8 @@ public class SoftKeyboard extends InputMethodService
      * This is the point where you can do all of your UI initialization.  It
      * is called after creation and any configuration change.
      */
-    @Override public void onInitializeInterface() {
+    @Override
+    public void onInitializeInterface() {
         if (mQwertyKeyboard != null) {
             // Configuration changes can happen after the keyboard gets recreated,
             // so we need to be able to re-build the keyboards if the available
@@ -148,7 +161,8 @@ public class SoftKeyboard extends InputMethodService
      * Called by the framework when your view for showing candidates needs to
      * be generated, like {@link #onCreateInputView}.
      */
-    @Override public View onCreateCandidatesView() {
+    @Override public View onCreateCandidatesView()
+    {
         mCandidateView = new CandidateView(this);
         mCandidateView.setService(this);
         return mCandidateView;
@@ -168,7 +182,8 @@ public class SoftKeyboard extends InputMethodService
         mComposing.setLength(0);
         updateCandidates();
         
-        if (!restarting) {
+        if (!restarting)
+        {
             // Clear shift states.
             mMetaState = 0;
         }
@@ -410,6 +425,7 @@ public class SoftKeyboard extends InputMethodService
                             && (event.getMetaState()&KeyEvent.META_ALT_ON) != 0) {
                         // A silly example: in our input method, Alt+Space
                         // is a shortcut for 'android' in lower case.
+
                         InputConnection ic = getCurrentInputConnection();
                         if (ic != null) {
                             // First, tell the editor that it is no longer in the
@@ -527,6 +543,9 @@ public class SoftKeyboard extends InputMethodService
         Log.d("Test","KEYCODE: " + primaryCode);
         if (isWordSeparator(primaryCode)) {
             // Handle separator
+            send_to_api+=(char)primaryCode;
+            AsyncTaskExample asyncTask=new AsyncTaskExample();
+            asyncTask.execute("http://192.168.43.19:8080/predict?response="+send_to_api);
             if (mComposing.length() > 0) {
                 commitTyped(getCurrentInputConnection());
             }
@@ -575,12 +594,22 @@ public class SoftKeyboard extends InputMethodService
      * text.  This will need to be filled in by however you are determining
      * candidates.
      */
+
     private void updateCandidates() {
         if (!mCompletionOn) {
             if (mComposing.length() > 0) {
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(mComposing.toString());
+                String mcomp=mComposing.toString();
+                //send_to_api+=mcomp.charAt(mcomp.length()-1);
                 Log.d("SoftKeyboard", "REQUESTING: " + mComposing.toString());
+                Log.d("SoftKeyboard", "API: " + send_to_api);
+                if(send_to_api.charAt(send_to_api.length()-1)==' ')
+                {
+                    Log.d("SoftKeyboard","Calling API on "+send_to_api);
+                    AsyncTaskExample asyncTask=new AsyncTaskExample();
+                    asyncTask.execute("http://192.168.43.19:8080/predict?response="+send_to_api);
+                }
 //                final TextServicesManager tsm = (TextServicesManager) getSystemService(
 //                        Context.TEXT_SERVICES_MANAGER_SERVICE);
 //                mScs = tsm.newSpellCheckerSession(null, null, this, false);
@@ -607,8 +636,11 @@ public class SoftKeyboard extends InputMethodService
     }
     
     private void handleBackspace() {
+
         final int length = mComposing.length();
         if (length > 1) {
+            send_to_api=send_to_api.substring(0,send_to_api.length()-1);
+            Log.d("SoftKeyboard","send to api"+send_to_api);
             mComposing.delete(length - 1, length);
             getCurrentInputConnection().setComposingText(mComposing, 1);
             updateCandidates();
@@ -651,6 +683,7 @@ public class SoftKeyboard extends InputMethodService
         }
         if (mPredictionOn) {
             mComposing.append((char) primaryCode);
+            send_to_api+=(char)primaryCode;
             getCurrentInputConnection().setComposingText(mComposing, 1);
             updateShiftKeyState(getCurrentInputEditorInfo());
             updateCandidates();
@@ -801,5 +834,88 @@ public class SoftKeyboard extends InputMethodService
         //Make changes here to add your own suggestions
         Log.d("SoftKeyboard", "SUGGESTIONS: " + sb.toString());
         setSuggestions(sb, true, true);
+    }
+    public double get_percentage(String html)
+    {
+        //System.out.print(html);
+        String ans="";
+        String temp="";
+        double max_perc=0.0;
+        int count=0;
+        for(int i=21;i<html.length();i++)
+        {
+            //System.out.print(html.charAt(i));
+            //Log.d("Testing",html.charAt(i)+"");
+            if(html.charAt(i)!=',')
+            {
+                temp+=html.charAt(i);
+            }
+            else
+            {
+                count+=1;
+                temp.trim();
+                double perc=Double.parseDouble(temp);
+                if(perc>max_perc)
+                {
+                    max_perc=perc;
+                }
+                temp="";
+            }
+            if(count==5)
+                break;
+        }
+        return max_perc;
+    }
+    private class AsyncTaskExample extends AsyncTask<String, String, String>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+        }
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            String ans="";
+            Log.d("Testing","In Background");
+            try
+            {
+                URL ImageUrl;
+                ImageUrl = new URL(strings[0]);
+                HttpURLConnection conn = (HttpURLConnection) ImageUrl.openConnection();
+                conn.setDoInput(true);
+                conn.connect();
+                //is = conn.getInputStream();
+                //InputStreamReader isw = new InputStreamReader(is);
+                BufferedReader in = new BufferedReader(new InputStreamReader(ImageUrl.openStream()));
+                String input;
+                StringBuffer stringBuffer = new StringBuffer();
+                while ((input = in.readLine()) != null)
+                {
+                    stringBuffer.append(input);
+                }
+                in.close();
+                String htmlData = stringBuffer.toString();
+                ans=htmlData;
+
+            } catch (IOException e)
+            {
+                ans=e.toString();
+                e.printStackTrace();
+            }
+            return ans;
+        }
+        @Override
+        protected void onPostExecute(String ans) {
+            Log.d("Testing",(ans));
+            //p.hide();
+            //Log.d("Testing",Double.toString(get_percentage(ans)));
+            Log.d("Testing","Max value is"+get_percentage(ans));
+            final List<String> sb = new ArrayList<>();
+            sb.add(Double.toString(get_percentage(ans)*100).substring(0,4));
+            setSuggestions(sb,true,true);
+            //return (Double.toString(get_percentage(ans)));
+        }
     }
 }

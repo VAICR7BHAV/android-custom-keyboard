@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" package="id.hipe.customkeyboard">
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application android:label="@string/ime_name" tools:ignore="GoogleAppIndexingWarning"
         android:allowBackup="true"
@@ -9,6 +10,8 @@
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher"
         android:theme="@style/Theme.AppCompat"
+        android:networkSecurityConfig="@xml/network_security_config"
+
         android:supportsRtl="true">
         <activity android:name="id.hipe.sampleapp.MainActivity">
             <intent-filter>

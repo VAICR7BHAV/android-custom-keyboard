@@ -13,4 +13,5 @@
     android:background="@color/colorPrimaryDark"
     android:popupLayout="@layout/keyboard_popup_layout" >
 
+
 </id.hipe.customkeyboard.LatinKeyboardView>
