@@ -47,13 +47,19 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Example of writing an input method for a soft keyboard.  This code is
@@ -89,7 +95,7 @@ public class SoftKeyboard extends InputMethodService
     private boolean mCapsLock;
     private long mLastShiftTime;
     private long mMetaState;
-    
+    List<String> suggestion_list_async;
     private LatinKeyboard mSymbolsKeyboard;
     private LatinKeyboard mSymbolsShiftedKeyboard;
     private LatinKeyboard mQwertyKeyboard;
@@ -102,10 +108,82 @@ public class SoftKeyboard extends InputMethodService
     private List<String> mSuggestions;
     private String[]bad_words={"2g1c","2 girls 1 cup","acrotomophilia","alabama hot pocket","alaskan pipeline","anal","anilingus","anus","apeshit","arsehole","ass","asshole","assmunch","auto erotic","autoerotic","babeland","baby batter","baby juice","ball gag","ball gravy","ball kicking","ball licking","ball sack","ball sucking","bangbros","bareback","barely legal","barenaked","bastard","bastardo","bastinado","bbw","bdsm","beaner","beaners","beaver cleaver","beaver lips","bestiality","big black","big breasts","big knockers","big tits","bimbos","birdlock","bitch","bitches","black cock","blonde action","blonde on blonde action","blowjob","blow job","blow your load","blue waffle","blumpkin","bollocks","bondage","boner","boob","boobs","booty call","brown showers","brunette action","bukkake","bulldyke","bullet vibe","bullshit","bung hole","bunghole","busty","butt","buttcheeks","butthole","camel toe","camgirl","camslut","camwhore","carpet muncher","carpetmuncher","chocolate rosebuds","circlejerk","cleveland steamer","clit","clitoris","clover clamps","clusterfuck","cock","cocks","coprolagnia","coprophilia","cornhole","coon","coons","creampie","cum","cumming","cunnilingus","cunt","dafuq","dank","darkie","date rape","daterape","deep throat","deepthroat","dendrophilia","dick","dork","dildo","dingleberry","dingleberries","dips hit","dirty pillows","dirty sanchez","doggie style","doggiestyle","doggy style","doggystyle","dog style","dolcett","domination","dominatrix","dommes","donkey punch","double dong","double penetration","douche","douchebag","dumbass","dp action","dry hump","dvda","eat my ass","ecchi","ejaculation","erotic","erotism","escort","eunuch","fag","faggot","fecal","felch","fellatio","feltch","female squirting","femdom","figging","fingerbang","fingering","fisting","foot fetish","footjob","frotting","fuck","fuck buttons","fuckin","fucking","fucktards","fudge packer","fudgepacker","futanari","gang bang","gay sex","genitals","giant cock","girl on","girl on top","girls gone wild","goatcx","goatse","god damn","gokkun","golden shower","goodpoop","goo girl","goregasm","grope","group sex","g-spot","guro","hand job","handjob","hard core","hardcore","hentai","hoe","homoerotic","honkey","hooker","hot carl","hot chick","how to kill","how to murder","huge fat","humping","incest","intercourse","jack off","jail bait","jailbait","jelly donut","jerk off","jigaboo","jiggaboo","jiggerboo","jizz","juggs","kike","kinbaku","kinkster","kinky","knobbing","leather restraint","leather straight jacket","lemon party","lolita","lovemaking","make me come","male squirting","masturbate","menage a trois","milf","missionary position","motherfucker","mound of venus","mr hands","muff diver","muffdiving","nambla","nawashi","negro","neonazi","nigga","nigger","nig nog","nimphomania","nipple","nipples","nsfw images","nude","nudity","nympho","nymphomania","octopussy","omorashi","one cup two girls","one guy one jar","orgasm","orgy","paedophile","paki","panties","panty","pedobear","pedophile","pegging","penis","phone sex","piece of shit","pissing","piss pig","pisspig","playboy","pleasure chest","pole smoker","ponyplay","poof","poon","poontang","punany","poop chute","poopchute","porn","porno","pornography","prince albert piercing","pthc","pubes","pussy","queaf","queef","quim","raghead","raging boner","rape","raping","rapist","rectum","reverse cowgirl","rimjob","rimming","rosy palm","rosy palm and her 5 sisters","rusty trombone","sadism","santorum","scat","schlong","scissoring","semen","sex","sexo","sexy","shaved beaver","shaved pussy","shemale","shibari","shit","shitblimp","shitty","shota","shrimping","skeet","slanteye","slut","s&m","smut","snatch","snowballing","sodomize","sodomy","spic","splooge","splooge moose","spooge","spread legs","spunk","strap on","strapon","strappado","strip club","style doggy","suck","sucks","suicide girls","sultry women","swastika","swinger","tainted love","taste my","tea bagging","threesome","throating","tied up","tight white","tit","tits","titties","titty","tongue in a","topless","tosser","towelhead","tranny","tribadism","tub girl","tubgirl","tushy","twat","twink","twinkie","two girls one cup","undressing","upskirt","urethra play","urophilia","vagina","venus mound","vibrator","violet wand","vorarephilia","voyeur","vulva","wank","wetback","wet dream","whore","white power","wrapping men","wrinkled starfish","xx","xxx","yaoi","yellow showers","yiffy","zoophilia","jigaboo","mound of venus","asslover","s&m","queaf","whitetrash","meatrack","ra8s","pimp","urine","whit","randy","herpes","niglet","narcotic","pudboy","rimming","boner","pornography","poop chute","israel","dong","slanteye","muffdiving","jiggabo","assassination","peepshpw","popimp","girl on","testicles","laid","molestor","peni5","tranny","barface","hell","arsehole","pissed","sixsixsix","execute","shitty ","conspiracy","hamas","cunilingus","bitcher","muslim","pee","niggled","muffindiver","cocksman","scag","aroused","niggling","fingerfucker ","nlggor","niggaz","assfuck","slant","urinate","mothafucked ","fungus","retard","gummer","venus mound","alla","spaghettinigger","piss","mickeyfinn","fuckers","jizzim","tramp","quashie","prince albert piercing","hardon","menage a trois","bukkake","shag","australian","raped","buggery","deth","weenie","lickme","reverse cowgirl","tonguetramp","cum","copulate","gun","schlong","cunn","damnit","crackpipe","buttmuncher","cameltoe","camgirl","hotpussy","cuntfucker","slave","sluts","ball licking","hentai","jackshit","dickman","doo-doo","gook","crimes","ho","bomd","shitdick","slapper","urinary","tantra","nookie","fuckedup","gubba","niggur","cybersex","dicklicker","cunillingus","hitlerism","butt","triplex","busty","dicklick","kunilingus","asian","tonguethrust","fistfucking ","assmonkey","criminal","cockknob","koon","children\'s","shat","footfucker","blonde action","spitter","weapon","dive","cumm","cuntlicking ","sexy-slim","lemon party","vibrater","upskirt","jijjiboo","fuckfriend","pthc","mothafucka","sniggered","buttfuckers","nutfucker","peehole","taboo","erection","nudity","bast","lesbayn","hummer","shortfuck","cherrypopper","adult","palestinian","pussylips","nooner","how to kill","blumpkin","stiffy","piss pig","beastiality","latin","butchbabes","spunk","gross","xx","crackwhore","butt-fuckers","kraut","pooping","style doggy","lactate","fecal","rusty trombone","wrinkled starfish","spigotty","dink","clogwog","whitey","dies","radical","slaughter","bollick","sodomite","balls","nimphomania","ball gag","poof","muff diver","jail bait","beaver","asspirate","bareback","pimpjuice","ballsack","bi-sexual","torture","limey","nookey","breastman","loser","kills","lesbo","beatyourmeat","lovemaking","munt","clitoris","fornicate","wet dream","double penetration","missionary position","bugger","lovejuice","date rape","eatballs","handjob","nlgger","dixiedyke","junglebunny","sonofabitch","goddamned","deep throat","jism","assclown","shitforbrains","screwyou","ethiopian","nastyslut","gang bang","lubejob","tied up","make me come","rimjob","sexfarm","tight white","lezbe","lezbo","tribadism","butt-bang","asskiss","sadism","biteme","angie","abortion","murderer","motherfucker","sextoy","2g1c","doggy style","cunntt","cooly","ball sack","sodom","slideitin","fudge packer","fatfuck","god","gipp","communist","felatio ","libido","xtc","cuntfuck","niggardly","fuckface","faggot","protestant","trailertrash","headfuck","shav","dickweed","refugee","trannie","giant cock","sexhound","slut","dead","titlover","wank","moslem","krappy","black cock","idiot","tortur","erotic","donkey punch","dirty pillows","cockcowboy","sucker","cocktail","doom","hymen","vibr","terrorist","mufflikcer","phonesex","teste","pisshead","slime","brea5t","tea bagging","slutt","cumbubble","blackout","hijacking","premature","sextogo","arse","racist","jimfish","flydye","juggs","jade","wigger","niggard\'s","jigg","dumb","devilworshipper","firing","gatorbait","murder","chinese","fastfuck","spik","nuke","bastinado","kondum","pansy","destroy","ikey","women rapping","titfucker","crime","swinger","shitola","killer","fart","booby","pimpsimp","coon","strap on","zigabo","faith","bisexual","gangsta","teat","boobies","kafir","dp action","jugs","husky","homoerotic","twinkie","spooge","kink","sleezebag","gay","homo","slutwhore","dickless","cumfest","israeli","fuk","niggardliness","nigr","goddamit","sandnigger","dope","insest","foreskin","acrotomophilia","dumbbitch","fuckmonkey","pubiclice","cyberslimer","titfuck","cummer","kumquat","one guy one jar","fire","sexo","carruth","cocktease","trisexual","pric","rabbi","gypp","cunnilingus","dipshit","welfare","arabs","transvestite","tnt","penile","mothafuckings","peckerwood","enemy","negroid","genital","gangbanger","queef","strapon","thicklips","female squirting","flydie","crabs","christ","ejaculate","carpet muncher","lucifer","butchdyke","vatican","skumbag","horseshit","eunuch","dickforbrains","bondage","kumbullbe","crack","niggerhole","niggard","rosy palm","assranger","beat-off","bastard ","asspuppies","jiggerboo","cuntlick ","pommie","doggie style","lezz","jesuschrist","nazi","feltch","chode","pleasure chest","wetback","zipperhead","necro","goddamnmuthafucker","whiskeydick","slopy","executioner","colored","ethnic","turnon","hole","nofuckingway","mastrabator","jack off","orgies","pisses ","blow j","criminals","cockqueen","tosser","snownigger","holestuffer","dipstick","mofo","nipplering","minority","italiano","palesimian","poo","horn","rape","genitals","conservative","jebus","bullcrap","dick","cumqueen","spread legs","cancer","kaffir","mocky","suckmytit","vorarephilia","naked","shited","nigg","spermhearder","whore","african","disease","lovebone","spreadeagle","coprolagnia","humping","suicide girls","bong","pole smoker","shrimping","gin","purinapricness","sexslave","big knockers","iblowu","pissin ","skank","lotion","asshole","easyslut","mothafucker","whiz","lsd","cocksucked ","hosejob","wanker","cumjockey","eat my ass","lovegoo","whites","propaganda","sexwhore","cunt","welcher","how to murder","scum","phuked","suckoff","shithapens","drug","auto erotic","sultry women","barenaked","wetspot","sixtynine","wrapping men","buttplug","jiggy","alligatorbait","flange","shitfit","dirty","huge fat","bulldyke","orgasm","bumfuck","deposit","big breasts","sexual","japanese","suckmyass","church","goyim","bohunk","bigass","fannyfucker","gaymuthafuckinwhore","babies","girls","turd","fuck buttons","fagging","pisser","sandm","wog","escort","octopussy","tinkle","snigger","groe","vibrator","dix","swalow","chin","niggles","asslicker","molester","backseat","geez","seppo","sexually","boong","voyeur","butthole","hoser","fore","asswhore","cocaine","skanky","european","mothafuck","titlicker","buttstain","penises","spermacide","mexican","skankybitch","white power","puddboy","coondog","stripclub","mockie","american","jesus","tushy","kumbubble","milf","mormon","ontherag","henhouse","slutty","big black","dego","daterape","phukked","cuntlicker ","failed","lezbefriends","pissing","bitchy","pohm","kigger","nastywhore","bangbros","upthebutt","cohee","fistfuck","fuckingbitch","shibari","cigs","jiggaboo","japcrap","raper","jackass","orgasim ","sexed","jackoff","baby batter","toilet","tampon","uk","porn","snowballing","goldenshower","titties","towelhead","titjob","abo","molestation","fok","crapola","foursome","suicide","scrotum","cumming","niggerhead","pussie","abuse","analannie","cocksucking","breastjob","blonde on blonde action","paedophile","kumming","reestie","suckme","willie","shhit","titbitnipply","hot chick","skankwhore","fudgepacker","dragqueen","deapthroat","barelylegal","circlejerk","shinola","hookers","flatulence","scat","damn","mafia","anus","gokkun","argie","buttpirate","goregasm","fagot","fuks","redneck","jiga","cockhead","freakfuck","2 girls 1 cup","crotchjockey","dripdick","die","fuckina","orgy","phungky","beaver cleaver","sexy","darky","magicwand","screw","dominatrix","butt-fucker","neonazi","fuckpig","manpaste","molest","whiskydick","lez","darkie","rearend","niggardliness\'s","trojan","smack","lapdance","brunette action","hindoo","fourtwenty","deepthroat","moles","hebe","pommy","fuckher","stringer","one cup two girls","peck","backdoorman","male squirting","shiting","clamdiver","fairy","pussylicker","slav","nigre","robber","horny","penetration","phuking","cigarette","dyefly","playboy","golden shower","cumshot","chinamen","pickaninny","diddle","fatah","bombers","suckdick","bigbastard","pube","mosshead","pornking","terror","pimper","fuckbuddy","period","catholics","pistol","g-spot","doodoo","mockey","funeral","prickhead","whop","allah","pussyeater","cocksmith","executed","barely legal","niggarding","swastika","buried","pocho","nip","weewee","whiskey","beast","phone sex","muncher","fuckhead","smackthemonkey","badfuck","harem","nigerians","bastardo","shooting","pissoff ","fistfucked ","ginzo","mattressprincess","primetime","undressing","fuckable","puss","bbw","damnation","jeez","stroking","leather restraint","yankee","piky","beastality","cocksucer","goddamn","poopchute","shitfaced","dickhead","gangbanged ","masterbate","pikey","rosy palm and her 5 sisters","doggiestyle","bitches","desire","pansies","dickbrain","sissy","felch","penis","horney","buttmunch","baptist","assassin","fingering","cock","osama","mothafucking ","republican","wetb","freefuck","rere","goatse","transexual","bunghole","assholes","butt-fuck","nig nog","snowback","sniper","gangbang","cockfight","death","mggor","skankbitch","goy","twat","masturbate","usama","babeland","dickwad","cornhole","nigra","fuckinright","blue waffle","clit","niggle","timbernigger","picaninny","whorefucker","yellowman","ass","ero","dommes","nig","lolita","grostulation","dixiedike","shitfucker","hymie","sheeney","asswipe","crash","vomit","died","femdom","cameljockey","footfuck","sonofbitch","cleveland steamer","dahmer","feltcher","bitch","fingerfuckers","buttface","evl","dammit","lovepistol","twink","shitting","blind","reefer","beaver lips","motherlovebone","panties","fucka","fatass","lugan","devil","pornflick","russkie","fight","thirdleg","hore","jerk off","negroes","moron","shaved beaver","gonzagas","drunken","blackman","asskisser","crotchrot","motherfuckin","lezzo","fondle","slopey","clusterfuck","fister","skankfuck","condom","kill","taff","shithouse","cockblock","hoes","horniest","kunt","facefucker","assmuncher","bollock","smut","stupidfuck","assmunch","prostitute","payo","poorwhitetrash","honkey","farting ","getiton","bulldike","raping","arab","moky","futanari","nigger","illegal","hardcore","skinflute","throating","asspacker","leather straight jacket","raghead","crotch","goo girl","knobbing","buttman","glazeddonut","urethra play","africa","fairies","fuckmehard","shaved pussy","bitchin","fu","cocks","fucker","gyppie","kinkster","penthouse","biatch","wop","erect","fag","fuck","shitfull","vaginal","fraud","color","flasher","filipino","sexpot","sexymoma","boonie","puke","buttcheeks","cacker","bdsm","shemale","porchmonkey","violet blue","eatme","looser","virgin","assbagger","limy","negro\'s","lesbian","hustler","cunteyed","tarbaby","nipples","dumbfuck","backdoor","wuzzie","sadom","threeway","pimpjuic","chinaman","brown showers","pubes","masturbating","bollocks","bunga","sodomize","goddammit","footstar","goatcx","chink","butthead","liquor","spermbag","jailbait","beatoff","incest","vagina","urophilia","niggarded","kaffer","rearentry","motherfucking","spic","areola","harder","greaseball","loverocket","asshore","perv","fingerfood","muff","shaggin","commie","hitler","burn","honky","tongue","fubar","oral","dildo","abbo","sniggering","bomb","omorashi","pedophile","spig","freakyfucker","swallower","birdlock","bigbutt","nastyho","goddamnes","pooperscooper","bi","sucks","jizz","nambla","puntang","gay sex","bootycall","reject","enema","sob","spankthemonkey","buggered","jewish","wuss","asslick","bitching","strip club","gringo","pendy","tard","boody","chocolate rosebuds","buttfuck","domination","faeces","splittail","clamdigger","shitlist","double dong","niggor","motherfucked","slimeball","pusy","pedobear","excrement","goddamnit","stagg","hijack","sexkitten","hook","coolie","phuq","servant","gyppo","slopehead","pud","fingerfuck ","dumbass","williewanker","fisting","crapper","sixtyniner","fetish","two girls one cup","threesome","bitchez","manhater","pudd","nympho","mothafuckin","shitted","hitlerist","semen","pi55","yaoi","scissoring","sodomise","ky","big tits","muffdiver","farty ","nsfw images","ecchi","dirty sanchez","mooncricket","shite","boom","asshat","fat","intercourse","chav","intheass","jacktheripper","felcher","spaghettibender","angry","gaysex ","willy","addict","russki","slimebucket","bogan","goodpoop","fuckme ","shitcan","brothel","rentafuck","footjob","sick","shitoutofluck","paki","rump","licker","nigerian","pindick","cockrider","felching","geezer","balllicker","ponyplay","fuckoff","jizzum","sadis","hodgie","fatfucker","poop","tits","bicurious","bombs","hork","mr hands","bi curious","sooty","liberal","prick","clover clamps","spunky","nymphomania","playgirl","vietcong","yellow showers","xxx","pecker","bitchslap","demon","crap","jihad","assjockey","macaca","kums","kinky","pooper","homicide","fuuck","poon","fear","shitfuck","tittie","wanking","girl on top","fistfucker ","zoophilia","farted ","nigglings","hiscock","tang","erotism","floo","honger","meth","beaner","kummer","wn","geni","whash","fuckinnuts","fuckin","tainted love","dyke","kotex","suck","poverty","butchdike","datnigga","uterus","execution","trots","luckycammeltoe","roach","swallow","motherfuck","blow","ball gravy","slutwear","panti","kissass","shawtypimp","muffdive","mulatto","noonan","wab","banging","tunneloflove","doggystyle","fuckwhore","rapist","homobangers","porno","barfface","sex","syphilis","pearlnecklace","sleezeball","sextoys","assman","german","shagging","anilingus","stupidfucker","loadedgun","beastial","shithead","asses","pussylover","niggah","gotohell","jigga","remains","frotting","thirdeye","fuckknob","inthebuff","nawashi","roundeye","retarded","mastabate","disturbed","kunnilingus","bung hole","pee-pee","camwhore","satan","lowlife","tubgirl","fucks","diseases","blow your l","krap","addicts","snatchpatch","bra","poontang","snatch","pussypounder","shit","knife","pu55i","footaction","footlicker","bimbos","mothafuckaz","pussycat","fucking","funfuck","piece of shit","boang","nipple","fuckit","shoot","quim","booty call","slutting","coitus","tit","spermherder","raging boner","buttfucker","quickie","grope","skum","rectum","kanake","soviet","lies","honkers","chinky","dingleberry","shota","hillbillies","godammit","fugly","nasty","ejaculation","waysted","carpetmuncher","nastybitch","camel toe","strappado","jew","limpdick","heroin","panty","polack","pornprincess","gonorrehea","meatbeatter","crotchmonkey","topless","shithappens","foot fetish","canadian","amateur","uck","whitenigger","niger","bigger","squaw","hand job","buttbang","titty","gypo","defecate","kock","niggaracci","pussyfucker","corruption","girls gone wild","boobs","ejaculated","shitface","autoerotic","creamy","bible","fckcum","knockers","fucck","whorehouse","cocksmoker","queer","cocklover","assblaster","bombing","hooters","forni","kike","hapa","bazooms","vulva","failure","racial","fuckfreak","snot","cuntsucker","fingerfucked ","scallywag","pixy","kkk","mastabater","byatch","whigger","sos","pussy","group sex","attack","fucktard","nook","marijuana","filipina","asscowboy","fatso","spit","bazongas","chickslick","joint","niggards","cockblocker","gob","lingerie","anal","headlights","dike","pegging","kaffre","taste my","crack-whore","lynch","tub girl","bullshit","explosion","black","homosexual","fucked","showtime","lesbin","kid","fellatio","nudger","women\'s","boonga","choad","assault","cra5h","tuckahoe","fingerfucking ","hijacker","athletesfoot","pom","livesex","hostage","cocknob","nude","hard core","fuckbag","hobo","itch","gyp","kyke","pros","stupid","radicals","figging","fuckfest","hottotrot","kinbaku","sexhouse","violet wand","analsex","nigga","nittit","jiz ","suckmydick","pussies","hotdamn","assfucker","jizim","pixie","kum","cemetery","rigger","ethical slut","dolcett","ejaculating ","babe","cumquat","eatpussy","phuk","givehead","drunk","phukking","shiteater","catholic","hooker","cocksuck ","cocksucker","ball kicking","fuckyou","crappy","feltching","mideast","ecstacy","ribbed","dog style","interracial","tongue in a","pocha","skankywhore","pu55y","motherfuckings","piker","peepshow","jap","yiffy","tongethruster","nigger\'s","breastlover","stroke","twobitwhore","shits","israel\'s","jerkoff","bullet vibe","assassinate","killed","pocketpool","whacker","wtf","barf","juggalo","negro","spick","gyppy","nymph","snigger\'s","violence","lovemuscle","dago","feces","booty","niggers","shitter","sodomy","hussy","pisspig","coprophilia","christian","pimped","boob","breast","sperm","coloured","redlight","blacks","orga","bumblefuck","mams","slavedriver","killing","uptheass","bestial","sweetness","heeb","piccaninny","pot","honk","jizjuice","fuc","nignog","mgger","sexing","virginbreaker","samckdaddy","masterblaster","heterosexual","jigger ","blowjob","lovegun","shitstain","spank","hiv","lesbain","mad","sniggers","jizm ","testicle","ball sucking","dragqween","guro","pubic","titfuckin","moneyshot","camslut","bountybar","assklown","cocky","transsexual","unfuckable","bestiality","cocklicker"};
     private HashMap <String,String> alternative_of;
+    private HashMap<String,Integer> count_of_words;
+    String offensive_perc="-0.1";
+    public void readmap()
+    {
+        try
+        {
+            FileInputStream fileInputStream  = new FileInputStream(new File(android.os.Environment.getExternalStorageDirectory(), "Word_count.txt"));
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            HashMap myNewlyReadInMap = (HashMap) objectInputStream.readObject();
+            objectInputStream.close();
+            count_of_words=myNewlyReadInMap;
+            for (Object name: myNewlyReadInMap.keySet())
+            {
+                String key = name.toString();
+                String value = myNewlyReadInMap.get(name).toString();
+                //System.out.println(key + " " + value);
+                Log.d("MAPMAPread","HashMap "+key + " " + value);
+            }
+            Log.d("MAPMAP","Map read from storage");
+        }
+        catch (Exception e)
+        {
+            Log.d("MAPMAP","Error occured while reading "+e.toString());
+            e.printStackTrace();
+        }
+    }
     public void check_bad_words(String query)
     {
         Log.d("SoftKeyboard","Checking");
         String words[]=query.split(" ");
+        List<String> sb=new ArrayList<>();
+        //sb.add(offensive_perc);
+        Log.d("SoftKeyboard",sb.toString());
+        try
+        {
+            Log.d("SoftKeyboard", "The last word typed is" + words[words.length - 1]);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            count_of_words.put(words[words.length-1].toLowerCase(),1+count_of_words.get(words[words.length-1].toLowerCase()));
+            //sb.add(alternative_of.get(words[words.length-1].toLowerCase()));
+            setSuggestions(sb,true,true);
+            Log.d("SoftKeyboard","Suggestion has been set");
+            Log.d("SoftKeyboard",sb.toString());
+        }
+        catch (Exception e)
+        {
+            count_of_words.put(words[words.length-1].toLowerCase(),1);
+            setSuggestions(sb,true,true);
+            Log.d("SoftKeyboard","Suggestion couldn't be set");
+            Log.d("SoftKeyboard",sb.toString());
+        }
+        try
+        {
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory(), "Word_count.txt"));
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(count_of_words);
+            objectOutputStream.close();
+            for (String name: count_of_words.keySet())
+            {
+                String key = name.toString();
+                String value = count_of_words.get(name).toString();
+                //System.out.println(key + " " + value);
+                Log.d("MAPMAPwrite","HashMap "+key + " " + value);
+            }
+            Log.d("MAPMAP","Map written to storage");
+        }
+        catch (Exception e)
+        {
+            Log.d("MAPMAP","Error occured while writing "+e.toString());
+            e.printStackTrace();
+        }
         for(int i=0;i<words.length;i++)
         {
             for(int j=0;j<bad_words.length;j++)
@@ -122,6 +200,11 @@ public class SoftKeyboard extends InputMethodService
     {
         alternative_of.put("ass","butt");
         alternative_of.put("fuck","****");
+        alternative_of.put("anus","butt");
+        alternative_of.put("bitch","bad woman");
+        alternative_of.put("cock","penis");
+        alternative_of.put("pussy","vagina");
+
     }
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -133,7 +216,9 @@ public class SoftKeyboard extends InputMethodService
         mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         mWordSeparators = getResources().getString(R.string.word_separators);
         alternative_of=new HashMap<>();
+        count_of_words=new HashMap<>();
         set_alternatives();
+        readmap();
         final TextServicesManager tsm = (TextServicesManager) getSystemService(
                 Context.TEXT_SERVICES_MANAGER_SERVICE);
         mScs = tsm.newSpellCheckerSession(null, null, this, true);
@@ -655,6 +740,14 @@ public class SoftKeyboard extends InputMethodService
         } else if (isExtractViewShown()) {
             setCandidatesViewShown(true);
         }
+        try
+        {
+            Log.d("SoftKeyboard", "In suggestions" + suggestions.toString());
+        }
+        catch (Exception e)
+        {
+
+        }
         mSuggestions = suggestions;
         if (mCandidateView != null) {
             mCandidateView.setSuggestions(suggestions, completions, typedWordValid);
@@ -853,10 +946,10 @@ public class SoftKeyboard extends InputMethodService
                         sb, ssi.getSuggestionsInfoAt(j), ssi.getOffsetAt(j), ssi.getLengthAt(j));
             }
         }
-        if(sb.size()>0)
-        sb.set(0,"Vaibhav");
-        else
-            sb.add("Vaibhav");
+//        if(sb.size()>0)
+//        sb.set(0,"Vaibhav");
+//        else
+//            sb.add("Vaibhav");
         //Make changes here to add your own suggestions
         Log.d("SoftKeyboard", "SUGGESTIONS: " + sb.toString());
         setSuggestions(sb, true, true);
@@ -897,8 +990,8 @@ public class SoftKeyboard extends InputMethodService
         @Override
         protected void onPreExecute()
         {
+            suggestion_list_async=new ArrayList<>();
             super.onPreExecute();
-
         }
         @Override
         protected String doInBackground(String... strings)
@@ -909,6 +1002,19 @@ public class SoftKeyboard extends InputMethodService
             {
                 URL ImageUrl;
                 ImageUrl = new URL(strings[0]);
+                String query_split[]=strings[0].split("=");
+                //Log.d("Testing","Query break="+query_split[0]+query_split[1]);
+                //Log.d("Testing","All strings="+strings[0]);
+                String words[]=query_split[1].split(" ");
+                //suggestion_list_async.add(words[words.length-1]);
+                try
+                {
+                    suggestion_list_async.add(alternative_of.get(words[words.length - 1]));
+                }
+                catch (Exception e)
+                {
+                    Log.d("Testing",e.toString());
+                }
                 HttpURLConnection conn = (HttpURLConnection) ImageUrl.openConnection();
                 conn.setDoInput(true);
                 conn.connect();
@@ -933,13 +1039,34 @@ public class SoftKeyboard extends InputMethodService
             return ans;
         }
         @Override
-        protected void onPostExecute(String ans) {
+        protected void onPostExecute(String ans)
+        {
             Log.d("Testing",(ans));
             //p.hide();
             //Log.d("Testing",Double.toString(get_percentage(ans)));
             Log.d("Testing","Max value is"+get_percentage(ans));
             final List<String> sb = new ArrayList<>();
-            sb.add(Double.toString(get_percentage(ans)*100).substring(0,4));
+            offensive_perc=Double.toString(get_percentage(ans)*100).substring(0,4);
+            sb.add(offensive_perc);
+            try
+            {
+                if(suggestion_list_async.get(0)!=null)
+                {
+                    sb.add(suggestion_list_async.get(0));
+                }
+            }
+            catch (Exception e)
+            {
+                Log.d("Testing",e.toString());
+            }
+            //suggestion_list_async.add(offensive_perc);
+            //setSuggestions(suggestion_list_async,true,true);
+            String temp_in_sb="";
+            for(int i=0;i<sb.size();i++)
+            {
+                temp_in_sb+=sb.get(i);
+            }
+            Log.d("Testing","String in sb is"+temp_in_sb+" "+sb.size());
             setSuggestions(sb,true,true);
             //return (Double.toString(get_percentage(ans)));
         }
