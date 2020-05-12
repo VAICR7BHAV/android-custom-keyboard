@@ -159,10 +159,14 @@ public class SoftKeyboard extends InputMethodService
         }
         catch (Exception e)
         {
+            try{
             count_of_words.put(words[words.length-1].toLowerCase(),1);
             setSuggestions(sb,true,true);
             Log.d("SoftKeyboard","Suggestion couldn't be set");
-            Log.d("SoftKeyboard",sb.toString());
+            Log.d("SoftKeyboard",sb.toString());}
+            catch (Exception e1)
+            {e1.printStackTrace();}
+
         }
         try
         {
@@ -201,10 +205,10 @@ public class SoftKeyboard extends InputMethodService
         alternative_of.put("ass","butt");
         alternative_of.put("fuck","****");
         alternative_of.put("anus","butt");
-        alternative_of.put("bitch","bad woman");
+        alternative_of.put("bitch","bad person");
         alternative_of.put("cock","penis");
         alternative_of.put("pussy","vagina");
-
+        alternative_of.put("bullshit","bullspit");
     }
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -648,12 +652,12 @@ public class SoftKeyboard extends InputMethodService
     // Implementation of KeyboardViewListener
 
     public void onKey(int primaryCode, int[] keyCodes) {
-        Log.d("Test","KEYCODE: " + primaryCode);
+        Log.d("TapTest","KEYCODE: " + primaryCode);
         if (isWordSeparator(primaryCode)) {
             // Handle separator
             send_to_api+=(char)primaryCode;
             AsyncTaskExample asyncTask=new AsyncTaskExample();
-            check_bad_words(send_to_api);
+            check_bad_words(send_to_api );
             asyncTask.execute("http://192.168.43.19:8080/predict?response="+send_to_api);
             if (mComposing.length() > 0)
             {
@@ -665,7 +669,9 @@ public class SoftKeyboard extends InputMethodService
             handleBackspace();
         } else if (primaryCode == Keyboard.KEYCODE_SHIFT) {
             handleShift();
-        } else if (primaryCode == Keyboard.KEYCODE_CANCEL) {
+        } else if (primaryCode == Keyboard.KEYCODE_CANCEL)
+        {
+            Log.d("TapTest","KEYCODE: closed" + primaryCode);
             handleClose();
             return;
         } else if (primaryCode == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
@@ -757,14 +763,18 @@ public class SoftKeyboard extends InputMethodService
     private void handleBackspace() {
 
         final int length = mComposing.length();
+        //final int length=send_to_api.length();
+        Log.d("Backspace_test","mcomposing"+mComposing);
         if (length > 1) {
             send_to_api=send_to_api.substring(0,send_to_api.length()-1);
-            Log.d("SoftKeyboard","send to api"+send_to_api);
+            Log.d("Backspace_test","send to api"+send_to_api);
             mComposing.delete(length - 1, length);
             getCurrentInputConnection().setComposingText(mComposing, 1);
+            //getCurrentInputConnection().setComposingText(send_to_api,1);
             updateCandidates();
         } else if (length > 0) {
             mComposing.setLength(0);
+            send_to_api="";
             getCurrentInputConnection().commitText("", 0);
             updateCandidates();
         } else {
@@ -815,6 +825,7 @@ public class SoftKeyboard extends InputMethodService
     private void handleClose() {
         commitTyped(getCurrentInputConnection());
         requestHideSelf(0);
+        send_to_api="";
         mInputView.closing();
     }
 
