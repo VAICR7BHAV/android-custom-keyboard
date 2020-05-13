@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
@@ -15,11 +17,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 import java.lang.StringBuilder
-
+import java.io.Serializable
 class MainActivity : AppCompatActivity() {
 
     private lateinit var tvKeyboard: TextView
     var count_of_words:HashMap<String, Int> = HashMap()
+    var offense_percentages = ArrayList<Double>()
     fun readmap() {
         try
         {
@@ -46,6 +49,28 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+    fun read_percentages() {
+        try
+        {
+            val fileInputStream = FileInputStream(File(android.os.Environment.getExternalStorageDirectory(), "Offense_Percentages.txt"))
+            val objectInputStream = ObjectInputStream(fileInputStream)
+            val myNewlyReadInList = objectInputStream.readObject() as ArrayList<Double>
+            objectInputStream.close()
+            offense_percentages = myNewlyReadInList
+            for (name in myNewlyReadInList)
+            {
+                //String key = name.toString();
+                //String value = myNewlyReadInMap.get(name).toString();
+                //System.out.println(key + " " + value);
+                Log.d("PercentageList", "List " + name)
+            }
+            Log.d("PercentageList", "List read from storage")
+        }
+        catch (e:Exception) {
+            Log.d("PercentageList", "Error occured while reading " + e.toString())
+            e.printStackTrace()
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -61,11 +86,31 @@ class MainActivity : AppCompatActivity() {
                 .show()
         }
     }
-
+    override fun onCreateOptionsMenu(menu: Menu):Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu)
+        return true
+    }
+    override fun onOptionsItemSelected(item: MenuItem):Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        val id = item.getItemId()
+        if (id == R.id.action_add_key)
+        {
+            val intent = Intent(this@MainActivity, Grapher::class.java)
+            val args = Bundle()
+            args.putSerializable("ARRAYLIST", offense_percentages as Serializable)
+            intent.putExtra("BUNDLE", args)
+            startActivity(intent)
+        }
+        return super.onOptionsItemSelected(item)
+    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 99)
         {
             readmap()
+            read_percentages()
             val builder=StringBuilder()
             for ((key, value) in count_of_words)
             {
