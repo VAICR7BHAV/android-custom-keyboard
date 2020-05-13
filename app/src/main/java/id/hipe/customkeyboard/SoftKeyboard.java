@@ -794,19 +794,33 @@ public class SoftKeyboard extends InputMethodService
         final int length = mComposing.length();
         //final int length=send_to_api.length();
         Log.d("Backspace_test","mcomposing"+mComposing);
-        if (length > 1) {
+        if(send_to_api.length()>1)
+        {
             send_to_api=send_to_api.substring(0,send_to_api.length()-1);
             Log.d("Backspace_test","send to api"+send_to_api);
+        }
+        else
+        {
+            send_to_api="";
+        }
+        if (length > 1)
+        {
+            //send_to_api=send_to_api.substring(0,send_to_api.length()-1);
+            //Log.d("Backspace_test","send to api"+send_to_api);
             mComposing.delete(length - 1, length);
             getCurrentInputConnection().setComposingText(mComposing, 1);
             //getCurrentInputConnection().setComposingText(send_to_api,1);
             updateCandidates();
-        } else if (length > 0) {
+        }
+        else if (length > 0)
+        {
             mComposing.setLength(0);
-            send_to_api="";
+            //send_to_api="";
             getCurrentInputConnection().commitText("", 0);
             updateCandidates();
-        } else {
+        }
+        else
+            {
             keyDownUp(KeyEvent.KEYCODE_DEL);
         }
         updateShiftKeyState(getCurrentInputEditorInfo());
