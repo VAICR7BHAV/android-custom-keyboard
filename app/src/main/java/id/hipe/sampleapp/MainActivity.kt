@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.text.Html
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvKeyboard: TextView
     var count_of_words:HashMap<String, Int> = HashMap()
     var offense_percentages = ArrayList<Double>()
+
     fun readmap() {
         try
         {
@@ -111,15 +113,23 @@ class MainActivity : AppCompatActivity() {
         {
             readmap()
             read_percentages()
+            count_of_words=HashMap_codes.sortByValue(count_of_words)
             val builder=StringBuilder()
+            builder.append("<b> Most frequently used words:</b> <br>")
+            var count=0
             for ((key, value) in count_of_words)
             {
                 builder.append("$key = $value\n ")
                 Log.d("MAPMAPdisp","$key = $value")
+                count+=1
+                if (count === 5)
+                {
+                    break
+                }
             }
             tvKeyboard.text = "Hipe keyboard now enabled"
             //tvKeyboard.text = "Hipe keyboard currently disabled"
-            tvKeyboard.text=builder
+            tvKeyboard.text=Html.fromHtml(builder.toString())
         }
     }
 

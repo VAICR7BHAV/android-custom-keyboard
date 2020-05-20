@@ -229,13 +229,16 @@ public class SoftKeyboard extends InputMethodService
     }
     public void set_alternatives()
     {
-        alternative_of.put("ass","butt");
-        alternative_of.put("fuck","****");
-        alternative_of.put("anus","butt");
+        alternative_of.put("ass","back");
+        alternative_of.put("fuck","snap");
+        alternative_of.put("anus","colon");
         alternative_of.put("bitch","bad person");
         alternative_of.put("cock","penis");
         alternative_of.put("pussy","vagina");
         alternative_of.put("bullshit","bullspit");
+        alternative_of.put("Fuck!","Blimey!");
+        alternative_of.put("Fuck","Blimey");
+        alternative_of.put("sex","coitus");
     }
     /**
      * Main initialization of the input method component.  Be sure to call
